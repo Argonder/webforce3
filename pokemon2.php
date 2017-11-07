@@ -1,176 +1,182 @@
-<!DOCTYPE html>
+
 <html>
 <head>
-	<title>Pokemon</title>
-	<link rel="stylesheet" type="text/css" href="style.css">
+  <!-- Insérer le css ici -->
+  <link rel="stylesheet" type="text/css" href="style.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 <body>
 
-<form>  
-<fieldset>
-<div>Point de vie <input type="test" name="pv_pikachu" value="<?php echo isset($_GET['pv_pikachu']) ? $_GET['pv_pikachu'] : ''; ?>"/></div>
-<div>Point de defense <input type="test" name="defense_pikachu" value="<?php echo isset($_GET['defense_pikachu']) ? $_GET['defense_pikachu'] : ''; ?>"/></div>
-<div>Point d\'attaque <input type="test" name="attaque_pikachu" value="<?php echo isset($_GET['attaque_pikachu']) ? $_GET['attaque_pikachu'] : ''; ?>"/></div>
-</fieldset>
-<fieldset>
-	<div>Point de vie <input type="test" name="pv_bulbizarre" value="<?php echo isset($_GET['pv_bulbizarre']) ? $_GET['pv_bulbizarre'] : ''; ?>"/></div>
-<div>Point de defense <input type="test" name="defense_bulbizarre" value="<?php echo isset($_GET['defense_bulbizarre']) ? $_GET['defense_bulbizarre'] : ''; ?>"/></div>
-<div>Point d\'attaque <input type="test" name="attaque_bulbizarre" value="<?php echo isset($_GET['attaque_bulbizarre']) ? $_GET['attaque_bulbizarre'] : ''; ?>"/></div>
-
-</fieldset>
-<button type="submit"> Combattez! </button>
-</form>
-
-
-
-
-
 <?php
-//tableau de pokemon ainsi que leur attribut
+// Initialisation des variables
+// Mes pokemons
+$pokemons = array();
+// Les pokemons ont 50 points à répartir entre vie, défense et attaque
+// Pikachu
+$pikachu = [
+  'pv' => 25,
+  'attaque' => 15,
+  'defense' => 10
+];
+$pokemons['Pikachu'] = $pikachu;
+// Bulbizarre
+$bulbizarre = [
+  'pv' => 30,
+  'attaque' => 8,
+  'defense' => 12
+];
+$pokemons['Bulbizarre'] = $bulbizarre;
+// Salameche
+$salameche = [
+  'pv' => 15,
+  'attaque' => 20,
+  'defense' => 15
+];
+$pokemons['Salameche'] = $salameche;
+echo '
+  <script type="text/javascript">
+    var pokemons = [];
+';
+foreach($pokemons as $pokemon => $stats) {
+  echo 'pokemons["' . $pokemon . '"] = [];' . "\n";
+  foreach ($stats as $cle => $valeur) {
+    echo 'pokemons["' . $pokemon . '"]["' . $cle . '"] = ' . $valeur . "\n";
+  }
+}
+echo '
+  function changePokemon1(event) {
+    selPokemon = $(this).val();
+    $("[name=\'pv_pokemon1\']").val(pokemons[selPokemon]["pv"]);	
+    $("[name=\'defense_pokemon1\']").val(pokemons[selPokemon]["defense"]);    
+    $("[name=\'attaque_pokemon1\']").val(pokemons[selPokemon]["attaque"]); 
+      }   
+      
 
-//information du form
-
-echo"<pre>";
-var_dump($_GET);
-var_dump($_POST);
-echo"</pre>";
-
-$pokemons = array(
-	'pokemon' => [
-	  'nom' => 'pikachu',
-	  'pv' => isset($_GET['pv_pikachu']) ? $_GET['pv_pikachu'] : 25,
-	  'defense' => isset($_GET['defense_pikachu']) ? $_GET['defense_pikachu'] : 10,
-	  'attaque' => isset($_GET['attaque_pikachu']) ? $_GET['attaque_pikachu'] : 15,
-
-	],
-
-	'pokemon2' => [
-		'nom' => 'bulbizarre' ,
-		'pv' => isset($_GET['pv_bulbizarre']) ? $_GET['pv_bulbizarre'] : 30,
-		'defense' => isset($_GET['defense_bulbizarre']) ? $_GET['defense_bulbizarre'] : 20,
-		'attaque' => isset($_GET['attaque_bulbizarre']) ? $_GET['attaque_bulbizarre'] : 8,
-
-	],
-	'pokemon3' => [
-		'nom' => 'salameche',
-		'pv' => 40,
-		'defense' => 15,
-		'attaque' => 50,
-	],
-	'pokemon4' => [
-		'nom' => 'carapuce',
-		'pv' => 40,
-		'defense' => 50,
-		'attaque' => 15, 
-
-		],
-
-);
-
-foreach($pokemons as $pokemon) {
-	echo 'nom : ' .$pokemon['nom'].'<br/>';
-	echo 'pv : ' .$pokemon['pv'].'<br/>';
-	echo 'defense :' .$pokemon['defense'].'<br/>';
-	echo 'attaque : ' .$pokemon['attaque'].'<br/>';
-	echo '<br/>';
+    function changePokemon2(event) {
+    selPokemon = $(this).val();
+    $("[name=\'pv_pokemon2\']").val(pokemons[selPokemon]["pv"]);
+    $("[name=\'defense_pokemon2\']").val(pokemons[selPokemon]["defense"]);
+	$("[name=\'attaque_pokemon2\']").val(pokemons[selPokemon]["attaque"]);   
+}
+  $(document).ready(function() {
+    $("#pokemon1").on("change", changePokemon1);
+    $("#pokemon2").on("change", changePokemon2);
+  });
+  </script>
+';
+// tableau de validation
+$form_error = [];
+// Validation du formulaire
+foreach($_GET as $input => $value) {
+  if ($input === 'pokemon1' || $input === 'pokemon2') {
+    if (!isset($pokemons[$value])) {
+      echo '<p style="">Le pokemon ' . $value . ' n\'est pas un pokemon disponible</p>';
+      $form_error[$input] = 1;
+    }
+  } elseif (empty($value) || !ctype_digit($value) || $value <= 0) {
+    echo '<p style="">Le champ ' . $input . ' doit un entier strictement supérieur à 0</p>';
+    $form_error[$input] = 1;
+  }
 }
 ?>
 
-
+  <form>
+    <fieldset>
+      <legend>Pokemon 1 :
+        <select id="pokemon1" name="pokemon1" <?php echo isset($form_error['pokemon1']) ? 'class="error"' : ''; ?>>
+          <?php
+            foreach($pokemons as $pokemon => $stats) {
+              echo '<option value="' . $pokemon . '">' . $pokemon . '</option>';
+            }
+          ?>
+        </select>
+      </legend>
+      <div>Points de vie : <input type="test" name="pv_pokemon1" value="<?php echo $pikachu['pv']; ?>" <?php echo isset($form_error['pv_pokemon1']) ? 'class="error"' : ''; ?> /></div>
+      <div>Points de défense : <input type="test" name="defense_pokemon1" value="<?php echo $pikachu['defense']; ?>" <?php echo isset($form_error['defense_pokemon1']) ? 'class="error"' : ''; ?> /></div>
+      <div>Points d'attaque : <input type="test" name="attaque_pokemon1" value="<?php echo $pikachu['attaque']; ?>" <?php echo isset($form_error['attaque_pokemon1']) ? 'class="error"' : ''; ?> /></div>
+    </fieldset>
+    <fieldset>
+      <legend>Pokemon 2 :
+        <select id="pokemon2" name="pokemon2" <?php echo isset($form_error['pokemon2']) ? 'class="error"' : ''; ?>>
+          <?php
+            foreach($pokemons as $pokemon => $stats) {
+              echo '<option value="' . $pokemon . '" ' . ($pokemon == 'Bulbizarre' ? 'selected' : '') . '>' . $pokemon . '</option>';
+            }
+          ?>
+        </select>
+      </legend>
+      <div>Points de vie : <input type="test" name="pv_pokemon2" value="<?php echo $bulbizarre['pv']; ?>" <?php echo isset($form_error['pv_pokemon2']) ? 'class="error"' : ''; ?> /></div>
+      <div>Points de défense : <input type="test" name="defense_pokemon2" value="<?php echo $bulbizarre['defense']; ?>" <?php echo isset($form_error['defense_pokemon2']) ? 'class="error"' : ''; ?> /></div>
+      <div>Points d'attaque : <input type="test" name="attaque_pokemon2" value="<?php echo $bulbizarre['attaque']; ?>" <?php echo isset($form_error['attaque_pokemon2']) ? 'class="error"' : ''; ?> /></div>
+    </fieldset>
+    <button type="submit">Combattez !</button>
+  </form>
 
 <?php
 /**
  * Bienvenue dans ce module PHP
  * Nous allons travailler à la réalisation d'un pokedex
  */
-// Pikachu
-$attaque_pikachu = 15;
-$defense_pikachu = 10;
-$pv_pikachu = 25;
-// Bulbizarre
-$attaque_bulbizarre = 8;
-$defense_bulbizarre = 20;
-$pv_bulbizarre = 30;
-
+// Vérifions les informations
+/*echo "<pre>";
+var_dump($_GET);
+var_dump($_POST);
+echo "</pre>";*/
+if (count($form_error) > 0)
+  die ("Le combat est reporté pour cause d'erreurs de saisie");
 $tour = 0;
-echo "Date : " . date('d/m/Y : H:i:s');
+//echo "Date : " . date('d/m/Y : H:i:s');
+// Boucle de combat
 do {
-
-	echo"<h2> Tour : " . ++$tour ." à ". date('H:i:s') . "</h2>";
-
-
-// pikachu attaque bulbizarre
-echo "<p>Pikachu attaque bulbizarre</p>";
-if ($pokemons['pokemon']['attaque'] >= $pokemons['pokemon2']['defense']) {
-  // L'attaque est supérieure à la défense : pikachu touche
-  $coup = $pokemons['pokemon']['attaque'] - $pokemons['pokemon2']['defense'] + 1; // La valeur du coup est la différence entre l'attaque et la défense
-  $pokemons['pokemon2']['pv'] -= $coup;
-  echo "<p>Bulbizarre perd $coup PV, il lui reste " .$pokemons['pokemon2']['pv']. " PV</p>";
-} else {
-  // La défense est supérieure à l'attaque, pikachu prend la moitié du coup et la défense baisse un peu
-  $coup = ($pokemons['pokemon2']['defense'] - $pokemons['pokemon']['attaque']) / 2;
-  $pokemons['pokemon']['pv'] -= $coup;
-  $pokemons['pokemon2']['defense'] -= 1;
-  echo "<p>Bulbizarre perd 1 Points de défense, il lui reste <span>".$pokemons['pokemon2']['defense']." Points de défense</span></p>";
-  echo "<p>Pikachu râte son attaque ! Il perd $coup Points de vie, il lui reste ".$pokemons['pokemon']['pv']." Points de vie</p>";
-}
-if ($pokemons['pokemon2']['pv'] <= 0) // S'il n'y a pas d'accolades après un if, seule la première instruction est filtrée par le if
-  echo "<p>Bulbizarre est KO !</p>";
-if ($pokemons['pokemon']['pv'] <= 0)
-  echo "<p>Pikachu est KO !</p>";
-// Et maintenant la contre-attaque : à vous de jouer !
-// bulbizarre attaque pikachu
-echo "<p>Bulbizarre attaque Pikachu</p>";
-if ($pokemons['pokemon2']['attaque'] >= $pokemons['pokemon']['defense']) {
-  // L'attaque est supérieure à la défense : bulbizarre touche
-  $coup = $pokemons['pokemon2']['attaque'] - $pokemons['pokemon']['defense'] + 1; // La valeur du coup est la différence entre l'attaque et la défense
-  $pokemons['pokemon']['pv'] -= $coup;
-  echo "<p>Pikachu perd $coup PV, il lui reste ".$pokemons['pokemon']['pv']." PV</p>";
-} else {
-  // La défense est supérieure à l'attaque, bulbizarre prend la moitié du coup et la défense baisse un peu
-  $coup = ($pokemons['pokemon']['defense'] - $pokemons['pokemon2']['attaque']) / 2;
-  $pokemons['pokemon2']['pv'] -= $coup;
-  $pokemons['pokemon']['defense'] -= 1;
-  echo "<p>Pikachu perd 1 Points de défense, il lui reste ".$pokemons['pokemon']['defense']." Points de défense</p>";
-  echo "<p>Bulbizarre râte son attaque ! Il perd $coup Points de vie, il lui reste ".$pokemons['pokemon2']['pv']." Points de vie</p>";
-}
-if ($pokemons['pokemon2']['pv'] <= 0) // S'il n'y a pas d'accolades après un if, seule la première instruction est filtrée par le if
-  echo "<p>Bulbizarre est KO !</p>";
-if ($pokemons['pokemon']['pv'] <= 0)
-  echo "<p>Pikachu est nul !</p>";
-
- sleep(0.25);
-}while($pokemons['pokemon']['pv'] > 0 && $pokemons['pokemon2']['pv'] > 0) ;
-
+  echo "<h2> Tour : " . ++$tour . " à " . date('H:i:s') . "</h2>";
+  // pikachu attaque bulbizarre
+  echo "<h3>Pikachu attaque bulbizarre</h3>";
+  if ($pikachu['attaque'] >= $bulbizarre['defense']) {
+    // L'attaque est supérieure à la défense : pikachu touche
+    $coup = $pikachu['attaque'] - $bulbizarre['defense'] + 1; // La valeur du coup est la différence entre l'attaque et la défense
+    $bulbizarre['pv'] -= $coup;
+    echo "<p>Bulbizarre perd $coup PV, il lui reste " . $bulbizarre['pv'] . " PV</p>";
+  } else {
+    // La défense est supérieure à l'attaque, pikachu prend la moitié du coup et la défense baisse un peu
+    $coup = ($bulbizarre['defense'] - $pikachu['attaque']) / 2;
+    $pikachu['pv'] -= $coup;
+    $bulbizarre['defense'] -= 1;
+    echo "<p>Bulbizarre perd 1 Points de défense, il lui reste " . $bulbizarre['defense'] . " Points de défense</p>";
+    echo "<p>Pikachu râte son attaque ! Il perd $coup Points de vie, il lui reste " . $pikachu['pv'] . " Points de vie</p>";
+  }
+  if ($bulbizarre['pv'] <= 0) // S'il n'y a pas d'accolades après un if, seule la première instruction est filtrée par le if
+    echo "<p>Bulbizarre est KO !</p>";
+  if ($pikachu['pv'] <= 0)
+    echo "<p>Pikachu est KO !</p>";
+  // Et maintenant la contre-attaque : à vous de jouer !
+  // bulbizarre attaque pikachu
+  echo "<h3>Bulbizarre attaque Pikachu</h3>";
+  if ($bulbizarre['attaque'] >= $pikachu['defense']) {
+    // L'attaque est supérieure à la défense : bulbizarre touche
+    $coup = $bulbizarre['attaque'] - $pikachu['defense'] + 1; // La valeur du coup est la différence entre l'attaque et la défense
+    $pikachu['pv'] -= $coup;
+    echo "<p>Pikachu perd $coup PV, il lui reste " . $pikachu['pv'] . " PV</p>";
+  } else {
+    // La défense est supérieure à l'attaque, bulbizarre prend la moitié du coup et la défense baisse un peu
+    $coup = ($pikachu['defense'] - $bulbizarre['attaque']) / 2;
+    $bulbizarre['pv'] -= $coup;
+    $pikachu['defense'] -= 1;
+    echo "<p>Pikachu perd 1 Points de défense, il lui reste " . $pikachu['defense'] . " Points de défense</p>";
+    echo "<p>Bulbizarre râte son attaque ! Il perd $coup Points de vie, il lui reste " . $bulbizarre['pv'] . " Points de vie</p>";
+  }
+  if ($bulbizarre['pv'] <= 0) // S'il n'y a pas d'accolades après un if, seule la première instruction est filtrée par le if
+    echo "<p>Bulbizarre est KO !</p>";
+  if ($pikachu['pv'] <= 0)
+    echo "<p>Pikachu est KO !</p>";
+} while ($pikachu['pv'] > 0 && $bulbizarre['pv'] > 0); // === !($pikachu['pv'] <= 0 || $bulbizarre['pv'] <= 0)
 // Ajoutons quelques baies pour restaurer des Points de Vies
 $pv_baie_rouge = 50;
 $pv_baie_noire = 30;
 // Bulbizarre mange une baie rouge
 // Pikachu mange une baie noire
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ?>
+
 
 </body>
 </html>
